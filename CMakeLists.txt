@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
-project(bayan_proj)
+
+set(PATCH_VERSION "1" CACHE INTERNAL "Patch version")
+set(PROJECT_VESRION 0.0.${PATCH_VERSION})
+project(bayan_proj VERSION ${PROJECT_VESRION})
 
 set(Boost_ARCHITECTURE -x64)
 
