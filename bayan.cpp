@@ -146,14 +146,12 @@ int main(int argc, char *argv[])
     while(!fl().empty()) {
         auto samp_it = fl().begin(), it = samp_it;
         size_t matches{0};
-        size_t count{0};
 
         for(++it; it != fl().end();) {
-            ++count;
             if(equal_files(*samp_it, *it)) {
                 if(!matches++)
-                    std::cout << samp_it->path << '\n';
-                std::cout << it->path << '\n';
+                    std::cout << samp_it->get_path() << '\n';
+                std::cout << it->get_path() << '\n';
                 it = fl().erase(it);
             } else ++it;
         }

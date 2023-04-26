@@ -39,9 +39,9 @@ public:
     enum class HashAlgorithm {crc32, md5, sha1};
     static inline  HashAlgorithm ha{HashAlgorithm::md5};
     static inline size_t block_size{128};
-    std::string path;
 
 private:
+    std::string path;
     std::ifstream ifs;
     size_t file_size{0};
     size_t blocks_total() {return (file_size - 1) / block_size + 1;}
@@ -57,12 +57,12 @@ public:
     ~FileStruct() {
         delete[] block_buf;
     }
-
+    std::string& get_path() {return path;}
     size_t size() {return file_size;}
     void reset() {
         cur_block = 0;
     }
-    boost::optional<hash_type &> H() {
+    boost::optional<hash_type &> hash() {
         boost::optional<hash_type& > retval{};
         if(cur_block >= hash_vec.size() && cur_block < blocks_total()) { // read next block from file and calculate hash
             try {
@@ -101,11 +101,6 @@ public:
             retval = hash_vec[cur_block++];
         }
         return retval;
-    }
-
-    std::string &operator ()()
-    {
-        return path;
     }
 
 }; // class FileStruct

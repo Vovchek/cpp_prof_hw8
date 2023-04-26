@@ -40,8 +40,8 @@ bool equal_files(FileStruct &file1, FileStruct &file2)
 
     boost::optional<hash_type> h1, h2;
     do {
-        h1 = file1.H();
-        h2 = file2.H();
+        h1 = file1.hash();
+        h2 = file2.hash();
         if(h1 != h2)
             return false;
     } while(h1 && h2);

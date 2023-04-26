@@ -3,7 +3,7 @@ project(bayan_proj)
 
 set(Boost_ARCHITECTURE -x64)
 
-find_package(Boost COMPONENTS program_options filesystem REQUIRED)
+find_package(Boost COMPONENTS program_options filesystem regex REQUIRED)
 #find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
@@ -17,5 +17,5 @@ target_link_libraries(bayan
         )
 
 set_target_properties(bayan PROPERTIES
-       COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+       COMPILE_DEFINITIONS BOOST_REGEX_DYN_LINK
        )
