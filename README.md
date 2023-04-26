@@ -15,9 +15,11 @@ The allowed options are:
   --hash arg (=md5)               hash function to use - md5, sha1 or crc32
 
 ===========================================================================
-problems and todos:
-- crc32 is not implemented
+problems, questions and todos:
 - how to compose unit tests? what to test?
 - localized charsets are displayed incorrectly, at least Unicode Cyrylic on Windows
 - raw pointer used for buffer is not exception-safe, should use smart pointer instead
 - code is not documented properly yet...
+- is bintray still alive?
+- how to use launch.json with VS Code to pass the parameters while debugging?
+  I've created launch.json but it has no effect.

@@ -7,7 +7,7 @@ project(bayan VERSION ${PROJECT_VESRION})
 set(Boost_ARCHITECTURE -x64)
 
 find_package(Boost COMPONENTS program_options filesystem regex REQUIRED)
-#find_package(Boost COMPONENTS unit_test_framework REQUIRED)
+#find_package(Boost COMPONENTS program_options filesystem REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR})
 

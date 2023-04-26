@@ -57,6 +57,7 @@ public:
     ~FileStruct() {
         delete[] block_buf;
     }
+
     std::string& get_path() {return path;}
     size_t size() {return file_size;}
     void reset() {
@@ -68,27 +69,33 @@ public:
             try {
                 if(!ifs.is_open()) {
                     ifs.open(path, std::ios_base::binary);
-                    block_buf = new char[block_size];
                     hash_vec.reserve(blocks_total());
                 }
+                if(!block_buf)
+                    block_buf = new char[block_size];
+                    //block_buf = std::make_unique<char>(block_size); // doesn't work, SEGFAULT on destructor!
 
+                //ifs.read(block_buf.get(), block_size);
                 ifs.read(block_buf, block_size);
                 if(ifs.eof())
                     ifs.close();
                 if(ifs.gcount() < block_size)
+                    //std::fill_n(block_buf.get()+ifs.gcount(), block_size-ifs.gcount(), 0);
                     std::fill_n(block_buf+ifs.gcount(), block_size-ifs.gcount(), 0);
 
                 switch(ha) {
                     case HashAlgorithm::md5:
+                        //hash_vec.emplace_back(str_hash<md5>(block_buf.get(), block_size));
                         hash_vec.emplace_back(str_hash<md5>(block_buf, block_size));
                         break;
                     case HashAlgorithm::sha1:
+                        //hash_vec.emplace_back(str_hash<sha1>(block_buf.get(), block_size));
                         hash_vec.emplace_back(str_hash<sha1>(block_buf, block_size));
                         break;
                     case HashAlgorithm::crc32:
                     default:
-                        std::cout << "Catastropha!!!\n";
-                        assert(0);
+                        //hash_vec.emplace_back(str_hash<crc>(block_buf.get(), block_size));
+                        hash_vec.emplace_back(str_hash<crc>(block_buf, block_size));
                         break;
                 }
 
@@ -121,6 +128,10 @@ public:
         return boost::regex_match(fn, mask);
     }
 
+    bool exclude_match(const fs::directory_entry &entry) {
+        return excl_dirs.find(entry.path().string()) != excl_dirs.end();
+    }
+
     void build() {
         for(auto &d : scan_dirs)
             add_files(d);
@@ -142,7 +153,7 @@ public:
             for(auto &entry : directory) {
                 auto level = directory.depth();
                 auto rp = directory.recursion_pending();
-                if(recurse >= 0 && level >= recurse && rp) {
+                if(((recurse >= 0 && level >= recurse) || exclude_match(entry)) && rp) {
                     directory.disable_recursion_pending();
                 }
                 add_file(entry);

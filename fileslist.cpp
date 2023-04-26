@@ -23,11 +23,22 @@ std::string wildcard_to_regex(const std::string &mask)
 template <typename Algo>
 hash_type str_hash(const char *buffer, size_t buffer_size)
 {
-    Algo boost_hash;
-    boost_hash.process_bytes(buffer, buffer_size);
-    hash_type digest{sizeof(typename Algo::digest_type)};
-    boost_hash.get_digest(reinterpret_cast<typename Algo::digest_type &>(digest[0]));
-    return digest;
+    if constexpr (std::is_same<Algo, md5>::value || std::is_same<Algo, sha1>::value) {
+        Algo boost_hash;
+        boost_hash.process_bytes(buffer, buffer_size);
+
+        hash_type digest{sizeof(typename Algo::digest_type)};
+        boost_hash.get_digest(reinterpret_cast<typename Algo::digest_type &>(digest[0]));
+        return digest;
+    } else if constexpr (std::is_same<Algo, crc>::value) {
+        Algo boost_hash;
+        boost_hash.process_bytes(buffer, buffer_size);
+
+        auto checksum = boost_hash.checksum();
+        return {reinterpret_cast<const char *>(&checksum), sizeof(checksum)};
+    } else {
+        return {buffer, buffer_size};
+    }
 }
 
 bool equal_files(FileStruct &file1, FileStruct &file2)
