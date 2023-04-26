@@ -16,6 +16,6 @@ target_link_libraries(bayan
         ${Boost_LIBRARIES}
         )
 
-# set_target_properties(test PROPERTIES
-#        COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-#        )
+set_target_properties(bayan PROPERTIES
+       COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+       )
