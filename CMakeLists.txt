@@ -10,7 +10,7 @@ include_directories(${Boost_INCLUDE_DIR})
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(bayan bayan.cpp)
+add_executable(bayan bayan.cpp fileslist.cpp)
 
 target_link_libraries(bayan
         ${Boost_LIBRARIES}
