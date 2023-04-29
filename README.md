@@ -18,8 +18,13 @@ The allowed options are:
 problems, questions and todos:
 - how to compose unit tests? what to test?
 - localized charsets are displayed incorrectly, at least Unicode Cyrylic on Windows
-- raw pointer used for buffer is not exception-safe, should use smart pointer instead
 - code is not documented properly yet...
 - is bintray still alive?
 - how to use launch.json with VS Code to pass the parameters while debugging?
   I've created launch.json but it has no effect.
+- project does not compile on CI/CD if boost component regex is not mentioned in 
+  find_pacage in CMakeLists.txt. On other hand it does not compile on Windows
+  computer on oposite case.
+- specifying in CMakeLists.txt
+    set_target_properties(bayan PROPERTIES COMPILE_DEFINITIONS BOOST_REGEX_DYN_LINK)
+  brings wrong program behaviour on local Windows computer, while build completes with no errors.

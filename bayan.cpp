@@ -159,5 +159,6 @@ int main(int argc, char *argv[])
             std::cout << '\n';
         fl().erase(samp_it);
     }
+    //std::cout << "normal termination\n";
 
 } /*main*/

@@ -46,8 +46,8 @@ private:
     size_t file_size{0};
     size_t blocks_total() {return (file_size - 1) / block_size + 1;}
     size_t cur_block{0};
-    //std::unique_ptr<char> block_buf; // i have to review how to use it
-    char *block_buf{nullptr};
+    std::unique_ptr<char[]> block_buf; // i have to review how to use it
+    //char *block_buf{nullptr};
     std::vector<hash_type> hash_vec;
 
 public:
@@ -55,7 +55,7 @@ public:
     FileStruct(const FileStruct&) = default;
     FileStruct(FileStruct&&) = default;
     ~FileStruct() {
-        delete[] block_buf;
+        //delete[] block_buf;
     }
 
     std::string& get_path() {return path;}
@@ -72,30 +72,30 @@ public:
                     hash_vec.reserve(blocks_total());
                 }
                 if(!block_buf)
-                    block_buf = new char[block_size];
-                    //block_buf = std::make_unique<char>(block_size); // doesn't work, SEGFAULT on destructor!
+                    //block_buf = new char[block_size];
+                    block_buf = std::make_unique<char[]>(block_size); // doesn't work, SEGFAULT on destructor!
 
-                //ifs.read(block_buf.get(), block_size);
-                ifs.read(block_buf, block_size);
+                ifs.read(block_buf.get(), block_size);
+                //ifs.read(block_buf, block_size);
                 if(ifs.eof())
                     ifs.close();
                 if(ifs.gcount() < block_size)
-                    //std::fill_n(block_buf.get()+ifs.gcount(), block_size-ifs.gcount(), 0);
-                    std::fill_n(block_buf+ifs.gcount(), block_size-ifs.gcount(), 0);
+                    std::fill_n(block_buf.get()+ifs.gcount(), block_size-ifs.gcount(), 0);
+                    //std::fill_n(block_buf+ifs.gcount(), block_size-ifs.gcount(), 0);
 
                 switch(ha) {
                     case HashAlgorithm::md5:
-                        //hash_vec.emplace_back(str_hash<md5>(block_buf.get(), block_size));
-                        hash_vec.emplace_back(str_hash<md5>(block_buf, block_size));
+                        hash_vec.emplace_back(str_hash<md5>(block_buf.get(), block_size));
+                        //hash_vec.emplace_back(str_hash<md5>(block_buf, block_size));
                         break;
                     case HashAlgorithm::sha1:
-                        //hash_vec.emplace_back(str_hash<sha1>(block_buf.get(), block_size));
-                        hash_vec.emplace_back(str_hash<sha1>(block_buf, block_size));
+                        hash_vec.emplace_back(str_hash<sha1>(block_buf.get(), block_size));
+                        //hash_vec.emplace_back(str_hash<sha1>(block_buf, block_size));
                         break;
                     case HashAlgorithm::crc32:
                     default:
-                        //hash_vec.emplace_back(str_hash<crc>(block_buf.get(), block_size));
-                        hash_vec.emplace_back(str_hash<crc>(block_buf, block_size));
+                        hash_vec.emplace_back(str_hash<crc>(block_buf.get(), block_size));
+                        //hash_vec.emplace_back(str_hash<crc>(block_buf, block_size));
                         break;
                 }
 
