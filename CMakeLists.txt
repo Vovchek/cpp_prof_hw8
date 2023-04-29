@@ -6,6 +6,8 @@ project(bayan VERSION ${PROJECT_VESRION})
 
 set(Boost_ARCHITECTURE -x64)
 
+set(Boost_USE_STATIC_LIBS   ON)
+
 find_package(Boost COMPONENTS program_options filesystem regex REQUIRED)
 #find_package(Boost COMPONENTS program_options filesystem REQUIRED)
 
@@ -18,10 +20,6 @@ add_executable(bayan bayan.cpp fileslist.cpp)
 target_link_libraries(bayan
         ${Boost_LIBRARIES}
         )
-
-set_target_properties(bayan PROPERTIES
-       COMPILE_DEFINITIONS BOOST_REGEX_DYN_LINK
-       )
 
 install(TARGETS bayan RUNTIME DESTINATION bin)
 
