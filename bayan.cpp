@@ -97,6 +97,8 @@ $ bayan [...]
 #ifdef BOOST_WINDOWS_API
     #include <windows.h>
     #define SET_CODEPAGE SetConsoleOutputCP(1251);
+#else
+    #define SET_CODEPAGE ;
 #endif
 
 namespace opt = boost::program_options;
