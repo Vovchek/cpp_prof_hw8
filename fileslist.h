@@ -106,15 +106,12 @@ public:
 class FilesList {
     friend class FilesListBuilder;
 
-    std::list<FileStruct> files;
-
     boost::regex mask;
     std::unordered_set<std::string> scan_dirs;// {".\\"};
     std::unordered_set<std::string> excl_dirs;// {""};
     int recurse {0};
     size_t min_size{1};
 
-public:
     bool mask_match(const std::string &fn) {
         return boost::regex_match(fn, mask);
     }
@@ -133,8 +130,10 @@ public:
         const auto full_path  = fs::canonical(p).string();
         const auto fn = p.filename().string();
 
-        if(fs::is_regular_file(p) && mask_match(fn) && fs::file_size(p) >= min_size)
-            files.emplace_back(FileStruct{full_path, fs::file_size(p)});
+        if(fs::is_regular_file(p) && mask_match(fn) && fs::file_size(p) >= min_size
+            && !fs::is_symlink(p)) {
+                files.emplace_back(FileStruct{full_path, fs::file_size(p)});
+            }
     }
 
     void add_files(const std::string &root) {
@@ -157,11 +156,14 @@ public:
 
     } // add_files()
 
+public:
+    std::list<FileStruct> files;
+    /*
     std::list<FileStruct> &operator ()()
     {
         return files;
     }
-
+    */
 };
 
 class FilesListBuilder {

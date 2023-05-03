@@ -94,11 +94,17 @@ $ bayan [...]
 
 #include "fileslist.h"
 #include <boost/program_options.hpp>
+#ifdef BOOST_WINDOWS_API
+    #include <windows.h>
+    #define SET_CODEPAGE SetConsoleOutputCP(1251);
+#endif
 
 namespace opt = boost::program_options;
 
 int main(int argc, char *argv[])
 {
+
+    SET_CODEPAGE;
 
     opt::options_description desc("Allowed options");
 
@@ -143,21 +149,22 @@ int main(int argc, char *argv[])
                             .set_hash(vm["hash"].as<std::string>())
                             .build();
 
-    while(!fl().empty()) {
-        auto samp_it = fl().begin(), it = samp_it;
+    auto files {std::move(fl.files)};
+    while(!files.empty()) {
+        auto samp_it = files.begin();
         size_t matches{0};
 
-        for(++it; it != fl().end();) {
+        for(auto it = std::next(samp_it); it != files.end();) {
             if(equal_files(*samp_it, *it)) {
                 if(!matches++)
                     std::cout << samp_it->get_path() << '\n';
                 std::cout << it->get_path() << '\n';
-                it = fl().erase(it);
+                it = files.erase(it);
             } else ++it;
         }
-        if(matches != 0 && !fl().empty())
+        if(matches != 0 && !files.empty())
             std::cout << '\n';
-        fl().erase(samp_it);
+        files.erase(samp_it);
     }
     //std::cout << "normal termination\n";
 
