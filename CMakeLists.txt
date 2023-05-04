@@ -8,8 +8,11 @@ set(Boost_ARCHITECTURE -x64)
 
 set(Boost_USE_STATIC_LIBS   ON)
 
-find_package(Boost COMPONENTS program_options filesystem regex REQUIRED)
-#find_package(Boost COMPONENTS program_options filesystem REQUIRED)
+if(WIN32)
+        find_package(Boost COMPONENTS program_options filesystem REQUIRED)
+else()
+        find_package(Boost COMPONENTS program_options filesystem regex REQUIRED)
+endif()
 
 include_directories(${Boost_INCLUDE_DIR})
 

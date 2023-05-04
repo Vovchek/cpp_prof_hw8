@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
     opt::notify(vm);
 
     FilesListBuilder builder;
-    FilesList &fl = builder.add_path(vm["path"].as<std::vector<std::string>>())
+    FilesList fl = builder.add_path(vm["path"].as<std::vector<std::string>>())
                             .exclude(vm["exclude"].as<std::vector<std::string>>())
                             .recurse(vm["recurse-level"].as<int>())
                             .set_mask(vm["mask"].as<std::string>())
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 
     auto files {std::move(fl.files)};
     while(!files.empty()) {
-        auto samp_it = files.begin();
+        auto samp_it {files.begin()};
         size_t matches{0};
 
         for(auto it = std::next(samp_it); it != files.end();) {

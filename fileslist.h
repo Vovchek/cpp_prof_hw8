@@ -158,12 +158,6 @@ class FilesList {
 
 public:
     std::list<FileStruct> files;
-    /*
-    std::list<FileStruct> &operator ()()
-    {
-        return files;
-    }
-    */
 };
 
 class FilesListBuilder {
@@ -220,9 +214,9 @@ public:
         return *this;
     }
 
-    FilesList &build() {
+    FilesList build() {
         fl.build();
-        return fl;
+        return std::move(fl);
     }
 private:
     FilesList fl;
