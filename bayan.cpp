@@ -151,7 +151,19 @@ int main(int argc, char *argv[])
                             .set_hash(vm["hash"].as<std::string>())
                             .build();
 
-    auto files {std::move(fl.files)};
+    auto files {fl.getFiles()};
+
+    auto vpFiles = filesListToPointersList(files);
+    std::vector<EqualPrefixFiles> dupes;
+    groupByNextBlock(vpFiles, dupes);
+
+    for(auto &fl : dupes) {
+        for(auto &f : fl) {
+            std::cout << f->get_path() << '\n';
+        }
+        std::cout << std::endl;
+    }
+
     while(!files.empty()) {
         auto samp_it {files.begin()};
         size_t matches{0};

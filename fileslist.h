@@ -16,6 +16,7 @@
 #include <unordered_set>
 #include <memory>
 #include <iomanip>
+#include <unordered_map>
 
 class FileStruct;
 class FileList;
@@ -28,6 +29,11 @@ using md5 = boost::uuids::detail::md5;
 using crc = boost::crc_32_type;
 using sha1 = boost::uuids::detail::sha1;
 using hash_type = std::string;
+using EqualPrefixFiles = std::list<FileStruct *>;
+using GroupedByHash = std::unordered_map<hash_type, EqualPrefixFiles>;
+
+EqualPrefixFiles filesListToPointersList(std::list<FileStruct> &files);
+void groupByNextBlock(EqualPrefixFiles &files, std::vector<EqualPrefixFiles> &dupes);
 
 template <typename Algo>
 hash_type str_hash(const char *buffer, size_t buffer_size);
@@ -50,7 +56,9 @@ private:
     std::vector<hash_type> hash_vec;
 
 public:
-    FileStruct(std::string path_, size_t file_size_) : path{path_}, file_size{file_size_} {}
+    FileStruct(std::string path_, size_t file_size_) : path{path_}, file_size{file_size_} {
+        hash_vec.push_back({reinterpret_cast<char *>(&file_size), sizeof(file_size)});
+        }
     FileStruct(const FileStruct&) = default;
     FileStruct(FileStruct&&) = default;
     ~FileStruct() = default;
@@ -60,16 +68,20 @@ public:
     void reset() {
         cur_block = 0;
     }
+    /** @brief returns hash for a block of file, specified with counter cur_block, latter increments on each call of hash()
+     * @details hash function can be crc32, sha1 or md5, static FileStruct::HashAlgorithm ha variable controls choise.
+     * File blocks are enumerated from 1 to blocks_total() and are cached in hash_vec,  hash_vec[0] contains file_size.
+     */
     boost::optional<hash_type &> hash() {
         boost::optional<hash_type& > retval{};
-        if(cur_block >= hash_vec.size() && cur_block < blocks_total()) { // read next block from file and calculate hash
+        if(cur_block >= hash_vec.size() && cur_block <= blocks_total()) { // read next block from file and calculate hash
             try {
                 if(!ifs.is_open()) {
                     ifs.open(path, std::ios_base::binary);
-                    hash_vec.reserve(blocks_total());
+                    hash_vec.reserve(blocks_total()+1);
                 }
                 if(!block_buf)
-                    block_buf = std::make_unique<char[]>(block_size); // doesn't work, SEGFAULT on destructor!
+                    block_buf = std::make_unique<char[]>(block_size);
 
                 ifs.read(block_buf.get(), block_size);
                 if(ifs.eof())
@@ -111,6 +123,7 @@ class FilesList {
     std::unordered_set<std::string> excl_dirs;// {""};
     int recurse {0};
     size_t min_size{1};
+    std::list<FileStruct> files;
 
     bool mask_match(const std::string &fn) {
         return boost::regex_match(fn, mask);
@@ -157,7 +170,10 @@ class FilesList {
     } // add_files()
 
 public:
-    std::list<FileStruct> files;
+    std::list<FileStruct> getFiles()
+    {
+        return std::move(files);
+    }
 };
 
 class FilesListBuilder {
